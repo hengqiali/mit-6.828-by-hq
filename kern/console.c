@@ -191,7 +191,7 @@ cga_putc(int c)
 		break;
 	}
 
-	// What is the purpose of this?
+	// clear the first line buff, and mobe to n-1 line to continue write ch
 	if (crt_pos >= CRT_SIZE) {
 		int i;
 

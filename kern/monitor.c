@@ -24,6 +24,7 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+	{ "backtrace", "Display the stack info of function", mon_backtrace},
 };
 
 /***** Implementations of basic kernel monitor commands *****/
@@ -57,7 +58,24 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// Your code here.
+	cprintf("Stack backtrace:\n");
+	uint32_t *ebp;
+	ebp = (uint32_t *)read_ebp();  //此时ebp=esp里面存储的当前栈顶的地址，地址上面就是返回值和参数
+	struct Eipdebuginfo info;
+	int ret = -1;
+	while (ebp != 0x0) {
+		cprintf("  ebp %08x", ebp);
+		cprintf("  eip %08x  args", *(ebp + 1));  // 当前ebp上一地址是返回值，即esp
+		ret = debuginfo_eip(*(ebp + 1), &info);
+		for (int i = 2; i < 7; i++) {			 // 当前ebp上一地址是参数
+			cprintf(" %08x", *(ebp + i));
+		}
+		cprintf("\n");
+		if (ret == 0) {
+			cprintf("         %s:%d: %.*s+%d\n", info.eip_file, info.eip_line, info.eip_fn_namelen ,info.eip_fn_name, *(ebp + 1) - info.eip_fn_addr);
+		}
+		ebp = (uint32_t *)(*ebp);  //当前ebp指向的地址里面存的值是上一层函数的ebp的地址
+	}
 	return 0;
 }
 
