@@ -21,7 +21,7 @@ extern pde_t *kern_pgdir;
 /* This macro takes a kernel virtual address -- an address that points above
  * KERNBASE, where the machine's maximum 256MB of physical memory is mapped --
  * and returns the corresponding physical address.  It panics if you pass it a
- * non-kernel virtual address.
+ * non-kernel virtual address.  直接映射，相差KERNBASE
  */
 #define PADDR(kva) _paddr(__FILE__, __LINE__, kva)
 
@@ -34,7 +34,7 @@ _paddr(const char *file, int line, void *kva)
 }
 
 /* This macro takes a physical address and returns the corresponding kernel
- * virtual address.  It panics if you pass an invalid physical address. */
+ * virtual address.  It panics if you pass an invalid physical address. 直接映射，相差KERNBASE*/
 #define KADDR(pa) _kaddr(__FILE__, __LINE__, pa)
 
 static inline void*
@@ -66,12 +66,16 @@ void	tlb_invalidate(pde_t *pgdir, void *va);
 int	user_mem_check(struct Env *env, const void *va, size_t len, int perm);
 void	user_mem_assert(struct Env *env, const void *va, size_t len, int perm);
 
+
+//pageinf得到索引号然后左移12位
+
 static inline physaddr_t
 page2pa(struct PageInfo *pp)
 {
 	return (pp - pages) << PGSHIFT;
 }
 
+// 物理地址右移12位得到得到pageinfo索引号
 static inline struct PageInfo*
 pa2page(physaddr_t pa)
 {
