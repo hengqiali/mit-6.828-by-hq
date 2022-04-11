@@ -25,9 +25,9 @@ typedef int32_t envid_t;
 // envid_ts less than 0 signify errors.  The envid_t == 0 is special, and
 // stands for the current environment.
 
-#define LOG2NENV		10
-#define NENV			(1 << LOG2NENV)
-#define ENVX(envid)		((envid) & (NENV - 1))
+#define LOG2NENV		10                     // 2^10，10位
+#define NENV			(1 << LOG2NENV)        // 1000 0000 000  进程的个数2^10
+#define ENVX(envid)		((envid) & (NENV - 1)) // 0111 1111 111  取envid_t的后10位
 
 // Values of env_status in struct Env
 enum {
