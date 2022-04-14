@@ -93,6 +93,7 @@ CFLAGS += -Wall -Wno-format -Wno-unused -Werror -gstabs -m32
 # -fno-tree-ch prevented gcc from sometimes reordering read_ebp() before
 # mon_backtrace()'s function prologue on gcc version: (Debian 4.7.2-5) 4.7.2
 CFLAGS += -fno-tree-ch
+CFLAGS += $(shell strings $$(which $(CC)) | grep -q address-of-packed-member && echo -Wno-error=address-of-packed-member)
 
 CFLAGS += -I$(TOP)/net/lwip/include \
 	  -I$(TOP)/net/lwip/include/ipv4 \
